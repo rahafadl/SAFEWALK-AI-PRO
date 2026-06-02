@@ -244,18 +244,18 @@ def save_detection_to_db(frame_idx: int, d: Detection):
 def default_rois(width: int, height: int, signal_state: Optional[SignalState] = None):
 
     waiting = np.array([
-      [int(width * 0.19), int(height * 0.63)],
-      [int(width * 0.58), int(height * 0.63)],
-      [int(width * 0.58), int(height * 0.74)],
-      [int(width * 0.19), int(height * 0.74)],
+     [int(width*0.20), int(height*0.78)],
+     [int(width*0.58), int(height*0.78)],
+     [int(width*0.58), int(height*0.88)],
+     [int(width*0.20), int(height*0.88)]
     ], dtype=np.int32)
 
     crosswalk = np.array([
-      [int(width * 0.19), int(height * 0.75)],
-      [int(width * 0.58), int(height * 0.75)],
-      [int(width * 0.58), int(height * 0.89)],
-      [int(width * 0.19), int(height * 0.89)],
-   ], dtype=np.int32)
+     [int(width*0.16), int(height*0.42)],
+     [int(width*0.60), int(height*0.42)],
+     [int(width*0.60), int(height*0.77)],
+     [int(width*0.16), int(height*0.77)]
+    ], dtype=np.int32)
 
     return waiting, crosswalk
 
