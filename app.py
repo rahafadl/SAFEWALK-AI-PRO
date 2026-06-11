@@ -60,7 +60,7 @@ PEDESTRIAN_LABELS = {"pedestrian", "person", "people"}
 WHEELCHAIR_LABELS = {"wheelchair", "wheelchair_user", "wheelchair user"}
 
 BASE_RED_SECONDS = 8
-BASE_GREEN_SECONDS = 10
+BASE_GREEN_SECONDS = 14
 WHEELCHAIR_GREEN_SECONDS = 18
 YELLOW_SECONDS = 3
 MAX_GREEN_SECONDS = 28
@@ -1014,7 +1014,6 @@ with tab_live:
     with right:
         signal_ph = st.empty()
         kpi_ph = st.empty()
-        events_ph = st.empty()
 
     if stop_btn:
         st.session_state.running = False
@@ -1033,11 +1032,9 @@ with tab_live:
         c.metric("Unique Ped.", st.session_state.unique_pedestrians)
         d.metric("Unique Chair", st.session_state.unique_wheelchairs)
         st.metric("Crossing Now", st.session_state.current_crossing)
-        st.metric("FPS", f"{st.session_state.fps:.1f}")
+        
 
-    with events_ph.container():
-        st.markdown("<div class='small-title'>Event Log</div>", unsafe_allow_html=True)
-        render_events(st.session_state.events)
+   
 
     if st.session_state.last_frame is not None:
         feed_ph.image(st.session_state.last_frame, use_container_width=True)
@@ -1163,12 +1160,9 @@ with tab_live:
                     c.metric("Unique Ped.", st.session_state.unique_pedestrians)
                     d.metric("Unique Chair", st.session_state.unique_wheelchairs)
                     st.metric("Crossing Now", st.session_state.current_crossing)
-                    st.metric("FPS", f"{st.session_state.fps:.1f}")
                     st.metric("Extensions", controller.extension_count)
 
-                with events_ph.container():
-                    st.markdown("<div class='small-title'>Event Log</div>", unsafe_allow_html=True)
-                    render_events(st.session_state.events)
+              
 
             if input_mode == "Video Upload":
                 time.sleep(0.02)
