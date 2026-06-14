@@ -100,14 +100,46 @@ html, body, .stApp{
 }
 #MainMenu, footer, header, .stDeployButton{visibility:hidden;display:none;}
 [data-testid="stSidebar"]{background:linear-gradient(180deg,#05080F,#0A0E1A)!important;border-right:1px solid var(--border);}
-[data-testid="metric-container"]{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:14px!important;padding:15px!important;box-shadow:0 0 22px rgba(255,215,0,.12)!important;}
-[data-testid="stMetricValue"]{font-family:'Orbitron',monospace!important;color:var(--gold)!important;}
-[data-testid="stMetricLabel"]{color:var(--muted)!important;}
+[data-testid="metric-container"]{background:linear-gradient(145deg,rgba(16,20,34,.94),rgba(6,9,18,.88))!important;border:1px solid rgba(255,215,0,.24)!important;border-radius:18px!important;padding:18px!important;box-shadow:0 0 28px rgba(255,215,0,.13), inset 0 0 22px rgba(255,215,0,.035)!important;min-height:104px!important;}
+[data-testid="stMetricValue"]{font-family:'Rajdhani','Orbitron',monospace!important;font-weight:700!important;color:var(--gold)!important;font-size:2.15rem!important;}
+[data-testid="stMetricLabel"]{color:var(--muted)!important;font-size:.86rem!important;letter-spacing:.03em!important;}
 .stButton>button{background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(255,215,0,.04))!important;border:1px solid rgba(255,215,0,.45)!important;color:var(--gold)!important;border-radius:10px!important;font-family:'Orbitron',monospace!important;letter-spacing:.08em!important;}
 .stButton>button:hover{box-shadow:0 0 25px rgba(255,215,0,.35)!important;transform:translateY(-1px);}
 .block-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 0 24px rgba(255,215,0,.10);}
 .small-title{font-family:'Orbitron',monospace;color:var(--gold);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;}
 .ar{font-family:'Cairo',sans-serif;direction:rtl;}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px;}
+.kpi-card{
+  background:linear-gradient(145deg,rgba(18,22,36,.74),rgba(4,7,15,.72));
+  border:1px solid rgba(255,215,0,.28);
+  border-radius:18px;
+  padding:15px 16px;
+  min-height:65px;
+  box-shadow:0 0 24px rgba(255,215,0,.12), inset 0 0 24px rgba(255,215,0,.035);
+  backdrop-filter:blur(14px);
+}
+.kpi-card.wide{grid-column:1 / -1;}
+.kpi-label{
+  font-family:'Rajdhani','Cairo',sans-serif;
+  color:rgba(232,222,179,.62);
+  font-size:.76rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.kpi-value{
+  font-family:'Orbitron','Rajdhani',monospace;
+  color:var(--gold);
+  font-size:1.55rem;
+  line-height:1;
+  font-weight:800;
+  text-shadow:0 0 18px rgba(255,215,0,.32);
+}
+
+.status-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,215,0,.08);padding:6px 0;color:rgba(232,222,179,.78);font-size:.86rem;}
+.status-row:last-child{border-bottom:0;}
+.status-dot{color:var(--green);font-family:Orbitron;text-shadow:0 0 12px rgba(0,255,120,.45);}
+[data-testid="stSidebar"] .stExpander{border:1px solid rgba(255,215,0,.18)!important;border-radius:14px!important;background:rgba(255,215,0,.03)!important;}
 </style>
 """,
     unsafe_allow_html=True,
@@ -244,18 +276,18 @@ def save_detection_to_db(frame_idx: int, d: Detection):
 def default_rois(width: int, height: int, signal_state: Optional[SignalState] = None):
 
     waiting = np.array([
-     [int(width*0.20), int(height*0.78)],
-     [int(width*0.58), int(height*0.78)],
-     [int(width*0.58), int(height*0.88)],
+     [int(width*0.20), int(height*0.77)],
+     [int(width*0.64), int(height*0.77)],
+     [int(width*0.64), int(height*0.88)],
      [int(width*0.20), int(height*0.88)]
-    ], dtype=np.int32)
+   ], dtype=np.int32)
 
     crosswalk = np.array([
-     [int(width*0.16), int(height*0.42)],
-     [int(width*0.60), int(height*0.42)],
-     [int(width*0.60), int(height*0.77)],
-     [int(width*0.16), int(height*0.77)]
-    ], dtype=np.int32)
+     [int(width*0.20), int(height*0.42)],
+     [int(width*0.64), int(height*0.42)],
+     [int(width*0.64), int(height*0.77)],
+     [int(width*0.20), int(height*0.77)]
+   ], dtype=np.int32)
 
     return waiting, crosswalk
 
@@ -295,7 +327,7 @@ def draw_roi_overlay(
             4
         )
 
-        cross_text = "CROSSWALK ACTIVE"
+        cross_text = "CROSSWALK"
         cross_color = (120, 255, 0)
 
     else:
@@ -329,22 +361,24 @@ def draw_roi_overlay(
     # ========================================================
     cv2.putText(
         frame,
-        "WAITING ZONE",
-        (waiting[0][0] + 10, waiting[0][1] - 12),
+        "WAITING",
+        (waiting[0][0] + 8, waiting[0][1] - 8),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.70,
+        0.32,
         (0, 255, 255),
-        2
+        1,
+        cv2.LINE_AA,
     )
 
     cv2.putText(
         frame,
         cross_text,
-        (crosswalk[0][0] + 10, crosswalk[0][1] - 12),
+        (crosswalk[0][0] + 8, crosswalk[0][1] - 8),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.70,
+        0.32,
         cross_color,
-        2
+        1,
+        cv2.LINE_AA,
     )
 
     return frame
@@ -772,33 +806,40 @@ def append_analytics(frame_idx: int, detections: List[Detection], signal: Signal
 # DRAWING
 # ============================================================
 def draw_detections(frame: np.ndarray, detections: List[Detection]) -> np.ndarray:
+    """Clean commercial-style detection overlay."""
     out = frame.copy()
 
     for d in detections:
         x1, y1, x2, y2 = d.box
 
-        if d.in_waiting_zone:
-            color = (0, 215, 255)
-            zone = "WAITING - COUNTED"
-        elif d.in_crosswalk:
-            color = (0, 255, 120)
-            zone = "CROSSING - KEEP GREEN"
-        else:
-            color = (90, 90, 90)
-            zone = "OUTSIDE ROI - IGNORED"
-
         if d.label == "wheelchair":
             color = (0, 255, 200)
+            label_name = "WHEELCHAIR"
+        else:
+            color = (0, 255, 120) if d.in_crosswalk else (0, 215, 255)
+            label_name = "PEDESTRIAN"
 
-        cv2.rectangle(out, (x1, y1), (x2, y2), color, 2)
-        cv2.circle(out, d.center, 5, color, -1)
+        if d.in_waiting_zone:
+            zone = "WAITING"
+        elif d.in_crosswalk:
+            zone = "CROSSING"
+        else:
+            zone = "TRACKED"
 
-        label = f"ID {d.track_id} | {d.label.upper()} | {d.conf:.0%} | {zone}"
-        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.48, 1)
+        # thinner, cleaner box
+        cv2.rectangle(out, (x1, y1), (x2, y2), color, 1)
+        cv2.circle(out, d.center, 4, color, -1)
 
+        # short presentation label
+        label = f"ID {d.track_id} | {label_name} | {zone}"
+        font_scale = 0.36
+        thickness = 1
+        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+
+        y_label = max(0, y1 - th - 8)
         cv2.rectangle(
             out,
-            (x1, max(0, y1 - th - 10)),
+            (x1, y_label),
             (min(out.shape[1] - 1, x1 + tw + 8), y1),
             color,
             -1,
@@ -808,21 +849,23 @@ def draw_detections(frame: np.ndarray, detections: List[Detection]) -> np.ndarra
             label,
             (x1 + 4, y1 - 5),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.48,
+            font_scale,
             (0, 0, 0),
-            1,
+            thickness,
             cv2.LINE_AA,
         )
 
     return out
 
-
 def draw_signal_hud(frame: np.ndarray, state: SignalState, countdown: int, ped: int, chair: int, crossing: int) -> np.ndarray:
+    """Compact signal HUD for presentation/demo view."""
     out = frame.copy()
-    panel_w, panel_h = 430, 118
-    x0, y0 = 15, 15
+    panel_w, panel_h = 210, 68
+    x0, y0 = 14, 14
 
-    cv2.rectangle(out, (x0, y0), (x0 + panel_w, y0 + panel_h), (5, 8, 15), -1)
+    panel = out.copy()
+    cv2.rectangle(panel, (x0, y0), (x0 + panel_w, y0 + panel_h), (5, 8, 15), -1)
+    out = cv2.addWeighted(panel, 0.58, out, 0.42, 0)
     cv2.rectangle(out, (x0, y0), (x0 + panel_w, y0 + panel_h), (0, 215, 255), 1)
 
     color_map = {
@@ -832,56 +875,322 @@ def draw_signal_hud(frame: np.ndarray, state: SignalState, countdown: int, ped: 
     }
     color = color_map[state]
 
-    cv2.circle(out, (x0 + 35, y0 + 34), 16, color, -1)
-    cv2.putText(out, f"{state.value}  {countdown:02d}s", (x0 + 65, y0 + 42),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+    cv2.circle(out, (x0 + 26, y0 + 27), 11, color, -1)
+    cv2.putText(
+        out,
+        f"{state.value}  {countdown:02d}s",
+        (x0 + 48, y0 + 35),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        color,
+        1,
+        cv2.LINE_AA,
+    )
 
-    cv2.putText(out, "Decision: WAITING starts | CROSSING holds green",
-                (x0 + 18, y0 + 72), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 215, 255), 1)
-
-    cv2.putText(out, f"Waiting: pedestrians={ped} wheelchair={chair} | Crossing={crossing}",
-                (x0 + 18, y0 + 98), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (232, 222, 179), 1)
+   
 
     return out
-
 
 # ============================================================
 # CHARTS
 # ============================================================
+GOLD = "#FFD700"
+GREEN = "#00FF78"
+CYAN = "#00FFCA"
+RED = "#FF3C3C"
+DARK_RED = "#8B1E1E"
+MUTED = "#8A7F5C"
+TEXT = "#E8DEB3"
+CARD_BG = "rgba(5,8,15,0)"
+GRID_GOLD = "rgba(255,215,0,.10)"
+
+
+def _premium_layout(fig: go.Figure, height: int = 330, showlegend: bool = True):
+    fig.update_layout(
+        height=height,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=TEXT, family="Rajdhani, Cairo, sans-serif"),
+        margin=dict(l=22, r=22, t=24, b=36),
+        legend=dict(
+            orientation="h",
+            y=-0.18,
+            x=0,
+            font=dict(color="rgba(232,222,179,.72)", size=11),
+        ) if showlegend else dict(font=dict(color=TEXT)),
+        hoverlabel=dict(bgcolor="#05080F", font_color=TEXT, bordercolor=GOLD),
+    )
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor="rgba(255,215,0,.055)",
+        zeroline=False,
+        linecolor="rgba(255,215,0,.18)",
+        tickfont=dict(color="rgba(232,222,179,.56)", size=10),
+    )
+    fig.update_yaxes(
+        showgrid=True,
+        gridcolor=GRID_GOLD,
+        zeroline=False,
+        linecolor="rgba(255,215,0,.18)",
+        tickfont=dict(color="rgba(232,222,179,.56)", size=10),
+    )
+    return fig
+
+
 def chart_counts(df: pd.DataFrame):
     fig = go.Figure()
     if not df.empty:
-        fig.add_trace(go.Scatter(x=df["time"], y=df["active_pedestrians"], name="Waiting Pedestrians", mode="lines", line=dict(width=2)))
-        fig.add_trace(go.Scatter(x=df["time"], y=df["active_wheelchairs"], name="Waiting Wheelchairs", mode="lines", line=dict(width=2)))
+        fig.add_trace(go.Scatter(
+            x=df["time"],
+            y=df["active_pedestrians"],
+            name="Waiting Pedestrians",
+            mode="lines",
+            line=dict(width=3, color=GREEN),
+            fill="tozeroy",
+            fillcolor="rgba(0,255,120,.08)",
+        ))
+        fig.add_trace(go.Scatter(
+            x=df["time"],
+            y=df["active_wheelchairs"],
+            name="Waiting Wheelchairs",
+            mode="lines",
+            line=dict(width=3, color=GOLD),
+            fill="tozeroy",
+            fillcolor="rgba(255,215,0,.09)",
+        ))
         if "active_crossing" in df.columns:
-            fig.add_trace(go.Scatter(x=df["time"], y=df["active_crossing"], name="Crossing Now", mode="lines", line=dict(width=2)))
-    fig.update_layout(height=260, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="#E8DEB3"), margin=dict(l=20,r=20,t=20,b=20))
+            fig.add_trace(go.Scatter(
+                x=df["time"],
+                y=df["active_crossing"],
+                name="Crossing Now",
+                mode="lines",
+                line=dict(width=3, color=CYAN),
+                fill="tozeroy",
+                fillcolor="rgba(0,255,202,.07)",
+            ))
+    fig = _premium_layout(fig, height=345, showlegend=True)
+    fig.update_yaxes(rangemode="tozero")
     return fig
 
 
 def chart_confidence(df: pd.DataFrame):
     fig = go.Figure()
     if not df.empty:
-        fig.add_trace(go.Scatter(x=df["time"], y=df["avg_confidence"], name="Avg Confidence", mode="lines"))
-    fig.update_layout(height=230, yaxis=dict(range=[0,1]), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="#E8DEB3"), margin=dict(l=20,r=20,t=20,b=20))
+        fig.add_trace(go.Scatter(
+            x=df["time"],
+            y=df["avg_confidence"],
+            name="Avg Confidence",
+            mode="lines",
+            line=dict(width=3, color=GOLD),
+            fill="tozeroy",
+            fillcolor="rgba(255,215,0,.10)",
+        ))
+    fig = _premium_layout(fig, height=250, showlegend=False)
+    fig.update_yaxes(range=[0, 1])
     return fig
 
 
 def chart_signal(df: pd.DataFrame):
     if df.empty:
-        return go.Figure()
+        fig = go.Figure()
+        return _premium_layout(fig, height=345, showlegend=False)
+
     counts = df["signal"].value_counts().reset_index()
     counts.columns = ["signal", "count"]
-    fig = go.Figure(go.Pie(labels=counts["signal"], values=counts["count"], hole=.55))
-    fig.update_layout(height=230, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="#E8DEB3"), margin=dict(l=20,r=20,t=20,b=20))
+
+    color_map = {
+        "GREEN": GREEN,
+        "YELLOW": GOLD,
+        "RED": RED,
+    }
+
+    fig = go.Figure(go.Pie(
+        labels=counts["signal"],
+        values=counts["count"],
+        hole=.66,
+        marker=dict(
+            colors=[color_map.get(str(s), MUTED) for s in counts["signal"]],
+            line=dict(color="rgba(255,215,0,.30)", width=2),
+        ),
+        textfont=dict(color=TEXT, size=12),
+        hovertemplate="%{label}<br>%{percent}<extra></extra>",
+    ))
+
+    fig.update_layout(
+        height=345,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=TEXT, family="Rajdhani, Cairo, sans-serif"),
+        margin=dict(l=10, r=10, t=20, b=20),
+        legend=dict(font=dict(color="rgba(232,222,179,.72)")),
+        annotations=[dict(
+            text="SIGNAL<br>STATES",
+            x=.5,
+            y=.5,
+            font=dict(color=GOLD, size=13, family="Orbitron"),
+            showarrow=False,
+        )],
+    )
+    return fig
+
+
+def chart_accessibility_activity(df: pd.DataFrame):
+    fig = go.Figure()
+    if not df.empty:
+        access_df = (
+            df.groupby("time")["accessibility_active"]
+            .sum()
+            .reset_index()
+        )
+        fig.add_trace(go.Bar(
+            x=access_df["time"],
+            y=access_df["accessibility_active"],
+            name="Accessibility Active",
+            marker=dict(
+                color=GOLD,
+                line=dict(color="rgba(255,255,255,.22)", width=1),
+            ),
+            hovertemplate="Accessibility Active: %{y}<extra></extra>",
+        ))
+    fig = _premium_layout(fig, height=315, showlegend=False)
+    fig.update_yaxes(rangemode="tozero")
+    return fig
+
+
+def chart_ratio(pedestrians: int, wheelchairs: int):
+    fig = go.Figure(go.Pie(
+        labels=["Pedestrians", "Wheelchairs"],
+        values=[pedestrians, wheelchairs],
+        hole=.70,
+        marker=dict(
+            colors=[GREEN, GOLD],
+            line=dict(color="rgba(255,215,0,.30)", width=2),
+        ),
+        textfont=dict(color=TEXT, size=12),
+        hovertemplate="%{label}<br>%{percent}<extra></extra>",
+    ))
+    fig.update_layout(
+        height=315,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=TEXT, family="Rajdhani, Cairo, sans-serif"),
+        margin=dict(l=10, r=10, t=18, b=18),
+        legend=dict(font=dict(color="rgba(232,222,179,.72)")),
+        annotations=[dict(
+            text="USER<br>RATIO",
+            x=.5,
+            y=.5,
+            font=dict(color=GOLD, size=13, family="Orbitron"),
+            showarrow=False,
+        )],
+    )
+    return fig
+
+
+def chart_scenarios():
+    """Portfolio scenario comparison based on the four demo clips."""
+    scenarios = [
+        "Pedestrian Only",
+        "Wheelchair Only",
+        "Pedestrian + Wheelchair",
+        "2 Pedestrians + Wheelchair",
+    ]
+    pedestrians = [1, 0, 1, 2]
+    wheelchairs = [0, 1, 1, 1]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=scenarios,
+        y=pedestrians,
+        name="Pedestrians",
+        marker=dict(
+            color=GREEN,
+            line=dict(color="rgba(255,255,255,.18)", width=1),
+        ),
+        hovertemplate="Pedestrians: %{y}<extra></extra>",
+    ))
+
+    fig.add_trace(go.Bar(
+        x=scenarios,
+        y=wheelchairs,
+        name="Wheelchairs",
+        marker=dict(
+            color=GOLD,
+            line=dict(color="rgba(255,255,255,.18)", width=1),
+        ),
+        hovertemplate="Wheelchairs: %{y}<extra></extra>",
+    ))
+
+    fig.update_layout(
+        barmode="stack",
+        title=dict(
+            text="Scenario Comparison",
+            font=dict(color=GOLD, family="Orbitron, Rajdhani, sans-serif", size=18),
+            x=0.02,
+        ),
+    )
+    fig = _premium_layout(fig, height=360, showlegend=True)
+    fig.update_yaxes(rangemode="tozero", dtick=1, title_text="Detected Users")
+    fig.update_xaxes(tickangle=0)
+    return fig
+
+
+def chart_accessibility_impact():
+    """Shows how wheelchair scenarios receive longer green time."""
+    scenarios = [
+        "Pedestrian Only",
+        "Wheelchair Only",
+        "Pedestrian + Wheelchair",
+        "2 Pedestrians + Wheelchair",
+    ]
+    green_seconds = [BASE_GREEN_SECONDS, WHEELCHAIR_GREEN_SECONDS, WHEELCHAIR_GREEN_SECONDS, WHEELCHAIR_GREEN_SECONDS]
+
+    fig = go.Figure(go.Bar(
+        x=scenarios,
+        y=green_seconds,
+        name="Green Time",
+        marker=dict(
+            color=[GREEN, GOLD, GOLD, GOLD],
+            line=dict(color="rgba(255,255,255,.20)", width=1),
+        ),
+        text=[f"{v}s" for v in green_seconds],
+        textposition="outside",
+        hovertemplate="Green Time: %{y}s<extra></extra>",
+    ))
+
+    fig.update_layout(
+        title=dict(
+            text="Accessibility Impact on Signal Timing",
+            font=dict(color=GOLD, family="Orbitron, Rajdhani, sans-serif", size=18),
+            x=0.02,
+        ),
+    )
+    fig = _premium_layout(fig, height=360, showlegend=False)
+    fig.update_yaxes(rangemode="tozero", title_text="Green Seconds")
+    fig.update_xaxes(tickangle=0)
     return fig
 
 
 def chart_heatmap(points: pd.DataFrame):
     fig = go.Figure()
     if not points.empty:
-        fig = px.density_heatmap(points, x="cx", y="cy", nbinsx=24, nbinsy=16, title="Movement / Waiting Heatmap")
-    fig.update_layout(height=300, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="#E8DEB3"), margin=dict(l=20,r=20,t=40,b=20))
+        fig = px.density_heatmap(
+            points,
+            x="cx",
+            y="cy",
+            nbinsx=24,
+            nbinsy=16,
+            title="Movement / Waiting Heatmap",
+            color_continuous_scale=[[0, "#05080F"], [0.45, "#8A7F5C"], [1, "#FFD700"]],
+        )
+    fig.update_layout(
+        height=300,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=TEXT),
+        margin=dict(l=20,r=20,t=40,b=20),
+    )
     return fig
 
 
@@ -912,59 +1221,129 @@ def traffic_light_html(state: SignalState, countdown: int):
     red, yellow, green, active = colors[state.value]
 
     st.markdown(f"""
-    <div class='block-card' style='text-align:center'>
-      <div class='small-title'>Traffic Signal</div>
-      <div style='margin:auto;background:#080B14;border:1px solid rgba(255,215,0,.25);border-radius:42px;width:82px;padding:14px;display:flex;flex-direction:column;gap:12px'>
-        <div style='width:50px;height:50px;border-radius:50%;background:{red};box-shadow:{'0 0 30px #FF3C3C' if state.value=='RED' else 'none'}'></div>
-        <div style='width:50px;height:50px;border-radius:50%;background:{yellow};box-shadow:{'0 0 30px #FFD700' if state.value=='YELLOW' else 'none'}'></div>
-        <div style='width:50px;height:50px;border-radius:50%;background:{green};box-shadow:{'0 0 30px #00FF78' if state.value=='GREEN' else 'none'}'></div>
+    <div class='block-card' style='text-align:center;padding:28px 18px;box-shadow:0 0 44px rgba(255,215,0,.18), inset 0 0 34px rgba(255,215,0,.04)'>
+      <div class='small-title' style='font-size:.86rem;margin-bottom:18px'>Traffic Signal</div>
+      <div style='margin:auto;background:#080B14;border:1px solid rgba(255,215,0,.34);border-radius:62px;width:105px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 34px rgba(255,215,0,.12)'>
+        <div style='width:65px;height:65px;border-radius:50%;background:{red};box-shadow:{'0 0 50px #FF3C3C, 0 0 76px rgba(255,60,60,.35)' if state.value=='RED' else 'inset 0 0 20px rgba(0,0,0,.62)'}'></div>
+        <div style='width:65px;height:65px;border-radius:50%;background:{yellow};box-shadow:{'0 0 50px #FFD700, 0 0 76px rgba(255,215,0,.35)' if state.value=='YELLOW' else 'inset 0 0 20px rgba(0,0,0,.62)'}'></div>
+        <div style='width:65px;height:65px;border-radius:50%;background:{green};box-shadow:{'0 0 50px #00FF78, 0 0 76px rgba(0,255,120,.35)' if state.value=='GREEN' else 'inset 0 0 20px rgba(0,0,0,.62)'}'></div>
       </div>
-      <div style='font-family:Orbitron;color:{active};font-size:1.2rem;margin-top:12px'>{state.value}</div>
-      <div style='font-family:Orbitron;color:#FFD700;font-size:2.3rem;margin-top:4px'>{countdown:02d}s</div>
+      <div style='font-family:Orbitron;color:{active};font-size:1.55rem;margin-top:20px;letter-spacing:.08em'>{state.value}</div>
+      <div style='font-family:Orbitron;color:#FFD700;font-size:2.3rem;margin-top:4px;text-shadow:0 0 26px rgba(255,215,0,.38)'>{countdown:02d}s</div>
     </div>
     """, unsafe_allow_html=True)
 
 
+
+def accessibility_alert_html():
+    st.markdown("""
+    <div style="
+        margin-top:12px;
+        margin-bottom:12px;
+        background:linear-gradient(135deg,rgba(0,255,120,.14),rgba(0,20,10,.74));
+        border:1px solid rgba(0,255,120,.44);
+        border-radius:16px;
+        padding:15px 20px;
+        display:flex;
+        align-items:center;
+        gap:16px;
+        box-shadow:
+            0 0 25px rgba(0,255,120,.25),
+            0 0 45px rgba(0,255,120,.15),
+            inset 0 0 18px rgba(0,255,120,.08);
+    ">
+        <div style="
+            font-size:42px;
+            color:#00FF78;
+            line-height:1;
+            min-width:48px;
+            text-align:center;
+            text-shadow:0 0 18px rgba(0,255,120,.55);
+        ">♿</div>
+        <div>
+            <div style="
+                font-family:Orbitron;
+                color:#00FF78;
+                font-size:.90rem;
+                font-weight:900;
+                letter-spacing:.06em;
+                text-transform:uppercase;
+            ">
+                ACCESSIBILITY PRIORITY ACTIVE
+            </div>
+            <div style="color:#D9E5DA;font-size:.86rem;margin-top:5px;">
+                Green signal extended for wheelchair crossing
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def render_kpi_cards():
+    avg_wait = compute_avg_waiting_time()
+    html = f"""
+    <div class='kpi-grid'>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Waiting Pedestrians</div>
+        <div class='kpi-value'>{st.session_state.current_pedestrians}</div>
+      </div>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Waiting Wheelchairs</div>
+        <div class='kpi-value'>{st.session_state.current_wheelchairs}</div>
+      </div>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Unique Pedestrians</div>
+        <div class='kpi-value'>{st.session_state.unique_pedestrians}</div>
+      </div>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Unique Wheelchairs</div>
+        <div class='kpi-value'>{st.session_state.unique_wheelchairs}</div>
+      </div>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Crossing Now</div>
+        <div class='kpi-value'>{st.session_state.current_crossing}</div>
+      </div>
+      <div class='kpi-card'>
+        <div class='kpi-label'>Accessibility Extensions</div>
+        <div class='kpi-value'>{st.session_state.signal_controller.extension_count}</div>
+      </div>
+      <div class='kpi-card wide'>
+        <div class='kpi-label'>Average Waiting Time</div>
+        <div class='kpi-value'>{avg_wait:.1f}s</div>
+      </div>
+    </div>
+   
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+
 # ============================================================
-# SIDEBAR
+# AUTO MODEL SETTINGS + SIDEBAR
 # ============================================================
+# Developer controls are kept as internal constants for a cleaner demo UI.
+model_path = DEFAULT_MODEL_PATH
+conf = DEFAULT_CONF
+process_n = PROCESS_EVERY_N_FRAMES
+
+# Load YOLO automatically once when the app starts. If best.pt is missing,
+# model remains None and the existing demo/mock tracking mode can still run.
+if not st.session_state.model_loaded:
+    st.session_state.model = load_model(model_path)
+    st.session_state.model_loaded = st.session_state.model is not None
+
 with st.sidebar:
     st.markdown("<div style='text-align:center;font-family:Orbitron;color:#FFD700;font-size:1.05rem'>⬡ SAFEWALK AI PRO</div>", unsafe_allow_html=True)
-    st.markdown("<div class='ar' style='text-align:center;color:#8A7F5C'>نظام عبور ذكي احترافي</div>", unsafe_allow_html=True)
+    st.markdown("<div class='ar' style='text-align:center;color:#8A7F5C'>نظام عبور ذكي </div>", unsafe_allow_html=True)
     st.divider()
 
-    input_mode = st.radio("Input Mode", ["Video Upload", "Webcam"], index=0)
-    model_path = st.text_input("YOLO model path", DEFAULT_MODEL_PATH)
-    conf = st.slider("Confidence", 0.10, 0.95, DEFAULT_CONF, 0.05)
-    process_n = st.slider("Process every N frames", 1, 5, PROCESS_EVERY_N_FRAMES, 1)
+    with st.expander("⚙ System Controls", expanded=False):
+        input_mode = st.radio("Input Mode", ["Video Upload", "Webcam"], index=0)
 
-    if st.button("LOAD MODEL", use_container_width=True):
-        st.session_state.model = load_model(model_path)
-        st.session_state.model_loaded = st.session_state.model is not None
+        st.divider()
 
-        if st.session_state.model_loaded:
-            st.success("Model loaded")
-            try:
-                st.write(st.session_state.model.names)
-            except Exception:
-                pass
-        else:
-            if not YOLO_AVAILABLE:
-                st.warning("Ultralytics not installed. Demo mode is active.")
-            elif not os.path.exists(model_path):
-                st.warning("Model not found. Demo mode is active.")
-            else:
-                st.error("Failed to load model.")
-
-    st.divider()
-
-    if st.button("RESET SESSION", use_container_width=True):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
-
-    if not st.session_state.model_loaded:
-        st.info("Demo mode will run if no best.pt is loaded.")
+        if st.button("RESET SESSION", use_container_width=True):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
 
 
 # ============================================================
@@ -980,7 +1359,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-tab_live, tab_analytics, tab_arch = st.tabs(["Live System", "Analytics", "Architecture Notes"])
+tab_live, tab_analytics = st.tabs(["Live System", "Analytics"])
 
 
 # ============================================================
@@ -992,24 +1371,26 @@ with tab_live:
     with left:
         st.markdown("<div class='small-title'>Live Detection + Tracking + ROI</div>", unsafe_allow_html=True)
         feed_ph = st.empty()
-        control_cols = st.columns(3)
-
-        uploaded_file = None
-        if input_mode == "Video Upload":
-            uploaded_file = st.file_uploader("Upload traffic / crosswalk video", type=["mp4", "avi", "mov", "mkv"])
+        control_cols = st.columns(2)
 
         with control_cols[0]:
             start_btn = st.button("START ANALYSIS", use_container_width=True)
+
         with control_cols[1]:
             stop_btn = st.button("STOP", use_container_width=True)
-        with control_cols[2]:
-            st.download_button(
-                "EXPORT CSV",
-                data=st.session_state.analytics.to_csv(index=False).encode("utf-8"),
-                file_name="safewalk_analytics.csv",
-                mime="text/csv",
-                use_container_width=True,
+
+        # Alert appears directly under START / STOP and above the upload widget
+        alert_ph = st.empty()
+
+        uploaded_file = st.session_state.get("uploaded_file_ref", None)
+
+        if input_mode == "Video Upload" and not st.session_state.running:
+            uploaded_file = st.file_uploader(
+                "Upload traffic / crosswalk video",
+                type=["mp4", "avi", "mov", "mkv"]
             )
+            if uploaded_file is not None:
+                st.session_state.uploaded_file_ref = uploaded_file
 
     with right:
         signal_ph = st.empty()
@@ -1022,19 +1403,20 @@ with tab_live:
         st.session_state.running = True
 
     with signal_ph.container():
-        traffic_light_html(st.session_state.signal_controller.state, st.session_state.signal_controller.time_left())
+        traffic_light_html(
+            st.session_state.signal_controller.state,
+            st.session_state.signal_controller.time_left()
+        )
+
+    with alert_ph.container():
+        if (
+            st.session_state.current_wheelchairs > 0
+            or st.session_state.signal_controller.extension_active
+        ):
+            accessibility_alert_html()
 
     with kpi_ph.container():
-        a, b = st.columns(2)
-        a.metric("Waiting Ped.", st.session_state.current_pedestrians)
-        b.metric("Waiting Chair", st.session_state.current_wheelchairs)
-        c, d = st.columns(2)
-        c.metric("Unique Ped.", st.session_state.unique_pedestrians)
-        d.metric("Unique Chair", st.session_state.unique_wheelchairs)
-        st.metric("Crossing Now", st.session_state.current_crossing)
-        
-
-   
+        render_kpi_cards()
 
     if st.session_state.last_frame is not None:
         feed_ph.image(st.session_state.last_frame, use_container_width=True)
@@ -1146,23 +1528,22 @@ with tab_live:
                 feed_ph.image(
                     rgb,
                     use_container_width=True,
-                    caption=f"Frame {frame_idx} | Tracking: ByteTrack | FPS {st.session_state.fps:.1f}",
                 )
 
                 with signal_ph.container():
                     traffic_light_html(controller.state, controller.time_left())
 
-                with kpi_ph.container():
-                    a, b = st.columns(2)
-                    a.metric("Waiting Ped.", st.session_state.current_pedestrians)
-                    b.metric("Waiting Chair", st.session_state.current_wheelchairs)
-                    c, d = st.columns(2)
-                    c.metric("Unique Ped.", st.session_state.unique_pedestrians)
-                    d.metric("Unique Chair", st.session_state.unique_wheelchairs)
-                    st.metric("Crossing Now", st.session_state.current_crossing)
-                    st.metric("Extensions", controller.extension_count)
+                with alert_ph.container():
+                    if (
+                        st.session_state.current_wheelchairs > 0
+                        or controller.extension_active
+                    ):
+                        accessibility_alert_html()
+                    else:
+                        st.empty()
 
-              
+                with kpi_ph.container():
+                    render_kpi_cards()
 
             if input_mode == "Video Upload":
                 time.sleep(0.02)
@@ -1178,83 +1559,157 @@ with tab_live:
         logger.log_once_cooldown("analysis_complete", "SYSTEM", "Analysis complete", "success")
         st.rerun()
 
-
 # ============================================================
-# ANALYTICS TAB
+# SIMPLE EXECUTIVE ANALYTICS TAB
 # ============================================================
 with tab_analytics:
+
     df = st.session_state.analytics.copy()
-    points = st.session_state.detection_points.copy()
 
-    k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Unique Pedestrians", st.session_state.unique_pedestrians)
-    k2.metric("Unique Wheelchairs", st.session_state.unique_wheelchairs)
-    k3.metric("Accessibility Events", st.session_state.signal_controller.extension_count)
-    k4.metric("Avg Waiting", f"{compute_avg_waiting_time():.1f}s")
-    k5.metric("Avg FPS", f"{st.session_state.fps:.1f}")
-
-    c1, c2 = st.columns([2, 1])
-    with c1:
-        st.markdown("<div class='small-title'>Real-time Detection Timeline</div>", unsafe_allow_html=True)
-        st.plotly_chart(chart_counts(df), use_container_width=True)
-    with c2:
-        st.markdown("<div class='small-title'>Signal Distribution</div>", unsafe_allow_html=True)
-        st.plotly_chart(chart_signal(df), use_container_width=True)
-
-    c3, c4 = st.columns([1, 1])
-    with c3:
-        st.markdown("<div class='small-title'>Detection Confidence Trend</div>", unsafe_allow_html=True)
-        st.plotly_chart(chart_confidence(df), use_container_width=True)
-    with c4:
-        st.markdown("<div class='small-title'>ROI Heatmap-ready Coordinates</div>", unsafe_allow_html=True)
-        st.plotly_chart(chart_heatmap(points), use_container_width=True)
-
-    st.markdown("<div class='small-title'>Raw Analytics</div>", unsafe_allow_html=True)
-    st.dataframe(df.tail(150), use_container_width=True, height=260)
-
-    st.markdown("<div class='small-title'>Detection Points for Heatmap / Audit</div>", unsafe_allow_html=True)
-    st.dataframe(points.tail(250), use_container_width=True, height=260)
-
-
-# ============================================================
-# ARCHITECTURE TAB
-# ============================================================
-with tab_arch:
-    st.markdown(
-        """
-<div class='block-card'>
-<div class='small-title'>Production Architecture Idea</div>
-<pre style='color:#E8DEB3;white-space:pre-wrap;font-size:.9rem'>
-Camera / RTSP Stream
-        ↓
-Frame Ingestion Service
-        ↓
-YOLO Detection Service + ByteTrack
-        ↓
-ROI Filter: Waiting Zone + Crosswalk Zone
-        ↓
-Decision Engine
-        ↓
-Traffic Signal State Machine
-        ↓
-Event Queue / Database
-        ↓
-FastAPI Real-time API
-        ↓
-Streamlit / React Dashboard
-</pre>
-</div>
-
-<br>
-
-<div class='block-card ar'>
-<b style='color:#FFD700'>ملاحظات مهمة:</b><br><br>
-1. Waiting Zone تبدأ الإشارة الخضراء.<br>
-2. Crosswalk Zone تمنع الإشارة من التحول للأصفر إذا الشخص لا يزال يعبر.<br>
-3. الكرسي المتحرك يفعّل تمديد إضافي.<br>
-4. يوجد حد أقصى للأخضر حتى لا يعلق النظام للأبد.<br>
-5. العد يعتمد على Unique Track IDs وليس كل Frame.<br>
-</div>
-""",
-        unsafe_allow_html=True,
+    total_crossings = (
+        st.session_state.unique_pedestrians
+        + st.session_state.unique_wheelchairs
     )
+
+    extensions = st.session_state.signal_controller.extension_count
+
+    st.markdown("""
+    <style>
+    .analytics-hero{
+        text-align:center;
+        margin:4px 0 30px;
+        padding:14px 16px 16px;
+        border:1px solid rgba(255,215,0,.18);
+        border-radius:22px;
+        background:
+          radial-gradient(circle at 50% 0%, rgba(255,215,0,.16), transparent 45%),
+          linear-gradient(135deg,rgba(18,22,36,.48),rgba(4,7,15,.38));
+        box-shadow:0 0 40px rgba(255,215,0,.13), inset 0 0 36px rgba(255,215,0,.035);
+    }
+    .analytics-title{
+        font-family:Orbitron,monospace;
+        font-size:2.55rem;
+        font-weight:900;
+        letter-spacing:.09em;
+        color:#FFD700;
+        text-shadow:0 0 35px rgba(255,215,0,.42);
+    }
+    .analytics-subtitle{
+        color:#8A7F5C;
+        font-size:.95rem;
+        margin-top:7px;
+        letter-spacing:.04em;
+    }
+    .analytics-kpi-grid{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:18px;
+        margin:12px 0 28px;
+    }
+    .analytics-kpi{
+        min-height:125px;
+        padding:20px 22px;
+        border-radius:20px;
+        border:1px solid rgba(255,215,0,.30);
+        background:linear-gradient(145deg,rgba(18,22,36,.78),rgba(4,7,15,.76));
+        box-shadow:0 0 30px rgba(255,215,0,.15), inset 0 0 25px rgba(255,215,0,.04);
+        position:relative;
+        overflow:hidden;
+    }
+    .analytics-kpi:before{
+        content:"";
+        position:absolute;
+        inset:-40% -20% auto auto;
+        width:120px;
+        height:120px;
+        background:radial-gradient(circle,rgba(255,215,0,.23),transparent 65%);
+    }
+    .analytics-kpi-label{
+        font-family:Rajdhani,Cairo,sans-serif;
+        color:rgba(232,222,179,.62);
+        font-size:.82rem;
+        letter-spacing:.11em;
+        text-transform:uppercase;
+    }
+    .analytics-kpi-value{
+        font-family:Orbitron,monospace;
+        color:#FFD700;
+        font-size:2.65rem;
+        font-weight:900;
+        margin-top:12px;
+        line-height:1;
+        text-shadow:0 0 25px rgba(255,215,0,.38);
+    }
+    .analytics-kpi-note{
+        color:rgba(232,222,179,.48);
+        margin-top:10px;
+        font-size:.82rem;
+    }
+
+    .analytics-section-title{
+        font-family:Orbitron,monospace;
+        color:#FFD700;
+        font-size:.92rem;
+        letter-spacing:.13em;
+        text-transform:uppercase;
+        margin-bottom:6px;
+    }
+    .analytics-section-note{
+        color:rgba(232,222,179,.54);
+        font-size:.86rem;
+        margin-bottom:12px;
+    }
+    .analytics-card{
+        border:1px solid rgba(255,215,0,.22);
+        border-radius:20px;
+        padding:18px 18px 12px;
+        background:linear-gradient(145deg,rgba(12,16,28,.72),rgba(3,6,12,.70));
+        box-shadow:0 0 28px rgba(255,215,0,.10), inset 0 0 24px rgba(255,215,0,.03);
+        margin-bottom:20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class='analytics-hero'>
+        <div class='analytics-title'>ACCESSIBILITY ANALYTICS CENTER</div>
+        <div class='analytics-subtitle'>Accessibility-Aware Smart Crosswalk Monitoring</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class='analytics-kpi-grid'>
+      <div class='analytics-kpi'>
+        <div class='analytics-kpi-label'>Total Crossings</div>
+        <div class='analytics-kpi-value'>{total_crossings}</div>
+        <div class='analytics-kpi-note'>Unique users detected in waiting zone</div>
+      </div>
+      <div class='analytics-kpi'>
+        <div class='analytics-kpi-label'>Wheelchair Users</div>
+        <div class='analytics-kpi-value'>{st.session_state.unique_wheelchairs}</div>
+        <div class='analytics-kpi-note'>Accessibility users detected</div>
+      </div>
+      <div class='analytics-kpi'>
+        <div class='analytics-kpi-label'>Accessibility Extensions</div>
+        <div class='analytics-kpi-value'>{extensions}</div>
+        <div class='analytics-kpi-note'>Green-time priority activations</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+    
+
+    if not df.empty:
+        col_a, col_b = st.columns([1.35, 1], gap="large")
+        with col_a:
+            st.markdown("<div class='analytics-card'><div class='analytics-section-title'>Real-Time Detection Timeline</div></div>", unsafe_allow_html=True)
+            st.plotly_chart(chart_counts(df), use_container_width=True, key="analytics_detection_timeline")
+        with col_b:
+            st.markdown("<div class='analytics-card'><div class='analytics-section-title'>Signal Distribution</div></div>", unsafe_allow_html=True)
+            st.plotly_chart(chart_signal(df), use_container_width=True, key="analytics_signal_distribution")
+
+    else:
+        st.info("Run an analysis first to populate the real-time charts.")
+
+
