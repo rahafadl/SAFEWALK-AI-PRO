@@ -4,7 +4,7 @@
 
 SafeWalk AI PRO is an AI-powered smart crosswalk system that improves pedestrian safety and accessibility using real-time computer vision. The system detects pedestrians and wheelchair users, tracks their movement, and dynamically adjusts traffic signal timing to provide safer road crossings, especially for wheelchair users.
 
-![SafeWalk AI PRO Dashboard](dash.png) 
+![SafeWalk AI PRO Dashboard](dash.jpg) 
 ## Key Features
 
 * Real-time pedestrian and wheelchair detection using YOLOv8
